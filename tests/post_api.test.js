@@ -83,6 +83,8 @@ describe('user creates / delete a post', () => {
 
         expect(post.likes).toBe(0);
         expect(response.body.context).toBe('This is a new post!');
+        expect(response.body).toHaveProperty('createdAt');
+        expect(response.body).toHaveProperty('updatedAt');
         expect(response.body.user.username).toBe('chikuma');
     });
 

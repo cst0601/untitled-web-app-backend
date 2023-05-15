@@ -20,6 +20,7 @@ const userRouter = require('./controllers/user');
 const loginRouter = require('./controllers/login');
 const postRouter = require('./controllers/post');
 const followRouter = require('./controllers/follow');
+const feedRouter = require('./controllers/feed');
 
 mongoose.connect(config.MONGODB_URI)
     .then(_ => {
@@ -39,6 +40,7 @@ app.use('/api/user', userRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/post', postRouter);
 app.use('/api/follow', followRouter);
+app.use('/api/feed', feedRouter);
 
 // error handlers
 app.use(middleware.unknownEndpoint);

@@ -6,21 +6,24 @@
 //
 const mongoose = require('mongoose');
 
-const postSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
+const postSchema = new mongoose.Schema(
+    {
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
+        context: {
+            type: String,
+            required: true,
+        },
+        likes: {
+            type: Number,
+            default: 0,
+        },
     },
-    context: {
-        type: String,
-        required: true,
-    },
-    likes: {
-        type: Number,
-        default: 0,
-    }
-});
+    { timestamps: true, }
+);
 
 postSchema.set('toJSON', {
     transform: (document, returnedObject) => {

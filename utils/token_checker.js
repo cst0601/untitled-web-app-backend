@@ -37,4 +37,6 @@ tokenCheckRouter.delete('/api/post/:id', checkToken);
 
 tokenCheckRouter.post('/api/follow/:id', checkToken);
 
+tokenCheckRouter.get('/api/feed', checkToken);
+
 module.exports = tokenCheckRouter;
