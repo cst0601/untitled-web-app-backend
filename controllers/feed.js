@@ -19,10 +19,22 @@ feedRouter.get('/', async (request, response) => {
         })
         .sort({ createdAt: -1 })
         .limit(100)
-        .populate('user', { username: 1, dispalyName: 1 });
+        .populate('user', { username: 1, displayName: 1 });
 
     response.json(posts);
 });
 
+feedRouter.get('/:username', async (request, response) => {
+    const requestUser = await User.findOne({
+        username: request.params.username
+    });
+    const posts = await Post
+        .find({ user: requestUser })
+        .sort({ createdAt: -1 })
+        .limit(100)
+        .populate('user', { username: 1, displayName: 1 });
+
+    response.json(posts);
+});
 
 module.exports = feedRouter;

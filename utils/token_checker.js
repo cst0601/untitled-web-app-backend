@@ -21,12 +21,17 @@ const checkToken = async (request, response, next) => {
         return response.status(401).json({ error: 'is not logged in.' });
     }
 
-    const decodedToken = jwt.verify(requestToken, process.env.SECRET);
-    if (!decodedToken.id) {
+
+    try {
+        const decodedToken = jwt.verify(requestToken, process.env.SECRET);
+        if (!decodedToken.id) {
+            return response.status(401).json({ error: 'invalid token' });
+        }
+        response.locals.userId = decodedToken.id;
+        response.locals.authentication = true;
+    } catch (error) {
         return response.status(401).json({ error: 'invalid token' });
     }
-    response.locals.userId = decodedToken.id;
-    response.locals.authentication = true;
 
     next();
 };
