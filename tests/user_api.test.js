@@ -34,10 +34,12 @@ describe('user_api', () => {
             password: 'p@ssword123456',
         };
 
-        await api
+        const response = await api
             .post('/api/user')
             .send(newUser)
             .expect(201);
+
+        expect(response.body).toHaveProperty('token');
 
         const users = await helper.usersInDb();
         const user = users.filter(u => u.username === newUser.username)[0];

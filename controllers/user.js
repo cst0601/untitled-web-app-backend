@@ -7,6 +7,7 @@
 const bcrypt = require('bcrypt');
 const userRouter = require('express').Router();
 const User = require('../models/user');
+const signToken = require('../utils/token');
 
 userRouter.get('/:id', async (request, response) => {
     const user = await User
@@ -27,8 +28,14 @@ userRouter.post('/', async (request, response, _next) => {
         displayName: user.displayName,
         passwordHash: passwordHash,
     });
+
     await newUser.save();
-    response.status(201).json(newUser);
+    const token = signToken(newUser.username, newUser._id);
+    response.status(201).json({
+        username: newUser.username,
+        displayName: newUser.displayName,
+        token: token,
+    });
 });
 
 module.exports = userRouter;
