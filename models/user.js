@@ -25,8 +25,15 @@ const userSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
+            default: [],
         }
-    ]
+    ],
+    likedPostIds: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Post',
+        }
+    ],
 });
 
 userSchema.plugin(uniqueValidator);
@@ -38,6 +45,7 @@ userSchema.set('toJSON', {
         delete returnedObject.__v;
         delete returnedObject.passwordHash;
         delete returnedObject.followedUserIds;
+        delete returnedObject.likedPostIds;
     }
 });
 

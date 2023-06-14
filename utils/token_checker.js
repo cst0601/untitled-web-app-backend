@@ -39,6 +39,8 @@ const checkToken = async (request, response, next) => {
 // router paths that requires authentication
 tokenCheckRouter.post('/api/post', checkToken);
 tokenCheckRouter.delete('/api/post/:id', checkToken);
+tokenCheckRouter.put('/api/post/like/:id', checkToken);
+tokenCheckRouter.delete('/api/post/like/:id', checkToken);
 
 tokenCheckRouter.post('/api/follow/:id', checkToken);
 

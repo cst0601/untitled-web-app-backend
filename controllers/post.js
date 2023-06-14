@@ -6,6 +6,7 @@
 //
 const postRouter = require('express').Router();
 
+const { param } = require('express/lib/router');
 const Post = require('../models/post');
 const User = require('../models/user');
 
@@ -45,6 +46,32 @@ postRouter.delete('/:id', async (request, response) => {
 
     await Post.findByIdAndDelete(request.params.id);
     response.status(204).end();
+});
+
+postRouter.put('/like/:id', async (request, response) => {
+    const user = await User.findById(response.locals.userId);
+    const post = await Post.findById(request.params.id);
+
+    if (!post) response.status(404).json({ error: 'post not found.' });
+
+    // mongodb / mongoose currently have problem ensuring array containing
+    // unique values, therefore, ensure uniqueness in application instead.
+    // (Which is a bad idea).
+    if (user.likedPostIds.indexOf(request.params.id) === -1)
+        user.likedPostIds.push(request.params.id);
+    await user.save();
+
+    response.status(200).end();
+});
+
+postRouter.delete('/like/:id', async (request, response) => {
+    const user = await User.findById(response.locals.userId);
+
+    user.likedPostIds = user.likedPostIds.filter(
+        id => id.toString() !== request.params.id);
+    await user.save();
+
+    response.status(200).end();
 });
 
 module.exports = postRouter;

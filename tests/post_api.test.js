@@ -133,3 +133,61 @@ describe('user creates / delete a post', () => {
             .expect(401);
     });
 });
+
+describe('user liked / unliked a post', () => {
+    let token = '';
+
+    beforeAll(async () => {
+        await helper.clearAndCreatePosts();
+        const loginResponse = await api
+            .post('/api/login')
+            .send({ username: 'chikuma', password: '123456789' })
+            .expect(200);
+        token = loginResponse.body.token;
+    });
+
+    test('user liked a post', async () => {
+        const likedPost = (await helper.postsInDb())[0];
+
+        await api.put(`/api/post/like/${likedPost.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200);
+
+        const user = (await helper.usersInDb(true))
+            .find(user => user.username === 'chikuma');
+        const likedPostIds = user.likedPostIds.map(
+            idObject => idObject.toString()
+        );
+        expect(likedPostIds).toContain(likedPost.id);
+    });
+
+    test('likedPostIds are unique', async () => {
+        const likedPost = (await helper.postsInDb())[0];
+
+        await api.put(`/api/post/like/${likedPost.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200);
+        await api.put(`/api/post/like/${likedPost.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200);
+
+        const user = (await helper.usersInDb(true))
+            .find(user => user.username === 'chikuma');
+        expect(user.likedPostIds.length).toBe(1);
+    });
+
+    test('user unliked a post', async () => {
+        const likedPost = (await helper.postsInDb())[0];
+
+        await api.put(`/api/post/like/${likedPost.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200);
+        await api.delete(`/api/post/like/${likedPost.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200);
+
+        const user = (await helper.usersInDb(true))
+            .find(user => user.username === 'chikuma');
+        expect(user.likedPostIds.length).toBe(0);
+    });
+});

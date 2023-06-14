@@ -15,8 +15,11 @@ const initialUsers = [
     }
 ];
 
-const usersInDb = async () => {
+const usersInDb = async (verbose = false) => {
     const users = await User.find({});
+
+    if (verbose) return users;
+
     return users.map(user => user.toJSON());
 };
 
