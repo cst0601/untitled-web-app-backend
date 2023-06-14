@@ -6,7 +6,6 @@
 //
 const postRouter = require('express').Router();
 
-const { param } = require('express/lib/router');
 const Post = require('../models/post');
 const User = require('../models/user');
 
