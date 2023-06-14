@@ -6,6 +6,7 @@
 //
 const postRouter = require('express').Router();
 
+const Like = require('../models/like');
 const Post = require('../models/post');
 const User = require('../models/user');
 
@@ -48,27 +49,28 @@ postRouter.delete('/:id', async (request, response) => {
 });
 
 postRouter.put('/like/:id', async (request, response) => {
-    const user = await User.findById(response.locals.userId);
+    //const user = await User.findById(response.locals.userId);
     const post = await Post.findById(request.params.id);
 
     if (!post) response.status(404).json({ error: 'post not found.' });
 
-    // mongodb / mongoose currently have problem ensuring array containing
-    // unique values, therefore, ensure uniqueness in application instead.
-    // (Which is a bad idea).
-    if (user.likedPostIds.indexOf(request.params.id) === -1)
-        user.likedPostIds.push(request.params.id);
-    await user.save();
+    const newLike = {
+        userId: response.locals.userId,
+        postId: request.params.id,
+    };
+
+    // likes are unique entries, therefore use findOneAndUpdate with upsert
+    // to create new entries.
+    await Like.findOneAndUpdate(newLike, newLike, { upsert: true });
 
     response.status(200).end();
 });
 
 postRouter.delete('/like/:id', async (request, response) => {
-    const user = await User.findById(response.locals.userId);
-
-    user.likedPostIds = user.likedPostIds.filter(
-        id => id.toString() !== request.params.id);
-    await user.save();
+    await Like.deleteOne({
+        userId: response.locals.userId,
+        postId: request.params.id
+    });
 
     response.status(200).end();
 });

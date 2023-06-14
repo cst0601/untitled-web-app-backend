@@ -15,12 +15,12 @@ const getTokenFrom = request => {
     return null;
 };
 
+// checks token, if authentication failed, return a invalid token response.
 const checkToken = async (request, response, next) => {
     const requestToken = getTokenFrom(request);
     if (!requestToken) {
         return response.status(401).json({ error: 'is not logged in.' });
     }
-
 
     try {
         const decodedToken = jwt.verify(requestToken, process.env.SECRET);
@@ -37,13 +37,17 @@ const checkToken = async (request, response, next) => {
 };
 
 // router paths that requires authentication
+// hard check
 tokenCheckRouter.post('/api/post', checkToken);
 tokenCheckRouter.delete('/api/post/:id', checkToken);
 tokenCheckRouter.put('/api/post/like/:id', checkToken);
 tokenCheckRouter.delete('/api/post/like/:id', checkToken);
+tokenCheckRouter.get('/api/feed', checkToken);
 
 tokenCheckRouter.post('/api/follow/:id', checkToken);
 
-tokenCheckRouter.get('/api/feed', checkToken);
+// soft check
+
+
 
 module.exports = tokenCheckRouter;

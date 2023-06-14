@@ -153,12 +153,12 @@ describe('user liked / unliked a post', () => {
             .set('Authorization', `Bearer ${token}`)
             .expect(200);
 
+        const likes = await helper.likesInDb();
+        const entry = likes.find(
+            like => like.postId.toString() === likedPost.id);
         const user = (await helper.usersInDb(true))
             .find(user => user.username === 'chikuma');
-        const likedPostIds = user.likedPostIds.map(
-            idObject => idObject.toString()
-        );
-        expect(likedPostIds).toContain(likedPost.id);
+        expect(entry.userId.toString()).toBe(user.id);
     });
 
     test('likedPostIds are unique', async () => {
@@ -173,7 +173,9 @@ describe('user liked / unliked a post', () => {
 
         const user = (await helper.usersInDb(true))
             .find(user => user.username === 'chikuma');
-        expect(user.likedPostIds.length).toBe(1);
+        const likes = (await helper.likesInDb())
+            .filter(like => like.userId.toString() === user.id);
+        expect(likes.length).toBe(1);
     });
 
     test('user unliked a post', async () => {
@@ -186,8 +188,9 @@ describe('user liked / unliked a post', () => {
             .set('Authorization', `Bearer ${token}`)
             .expect(200);
 
-        const user = (await helper.usersInDb(true))
-            .find(user => user.username === 'chikuma');
-        expect(user.likedPostIds.length).toBe(0);
+        const like = (await helper.likesInDb())
+            .find(like => like.postId.toString() === likedPost.id);
+        console.log(await helper.likesInDb());
+        expect(like).toBe(undefined);
     });
 });

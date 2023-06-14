@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const Post = require('../models/post');
+const Like = require('../models/like');
 
 const initialUsers = [
     {
@@ -92,6 +93,7 @@ const nonExistingPostId = async (userId) => {
 // The function will call clearAndCreteUsers as posts requires user id.
 const clearAndCreatePosts = async () => {
     await clearAndCreateUsers(); // need to first have users
+    await clearAllLikes();       // posts are assciated with likes
     await Post.deleteMany({});
 
     const user = await User.findOne({ username: 'chikuma' });
@@ -105,6 +107,17 @@ const clearAndCreatePosts = async () => {
     }));
 };
 
+// ---------- LIKE COLLECTION RELATED ----------
+
+const likesInDb = async () => {
+    const likes = await Like.find({});
+    return likes;
+};
+
+const clearAllLikes = async () => {
+    await Like.deleteMany({});
+};
+
 module.exports = {
     usersInDb,
     nonExistingUserId,
@@ -113,4 +126,6 @@ module.exports = {
     postsInDb,
     nonExistingPostId,
     clearAndCreatePosts,
+    likesInDb,
+    clearAllLikes,
 };
