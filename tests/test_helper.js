@@ -64,11 +64,9 @@ const initialPosts = [
         context:
             'Post context, here users fill this with some random text.' +
             ' For most of the times posts are meaningless.',
-        likes: 15,
     },
     {
         context: 'にゃっはろ～',
-        likes: 35,
     },
 ];
 

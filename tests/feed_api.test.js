@@ -30,5 +30,6 @@ describe('get user feeds', () => {
             .expect(200);
 
         expect(response.body).toHaveLength(2);
+        expect(response.body[0].likes).toBe(0);
     });
 });

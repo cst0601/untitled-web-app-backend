@@ -12,7 +12,7 @@ const User = require('../models/user');
 
 postRouter.get('/:id', async (request, response) => {
     const post = await Post
-        .findById(request.params.id)
+        .findOne({ _id: request.params.id })
         .populate('user', { username: 1, displayName: 1 });
 
     if (post) response.json(post);
@@ -49,7 +49,6 @@ postRouter.delete('/:id', async (request, response) => {
 });
 
 postRouter.put('/like/:id', async (request, response) => {
-    //const user = await User.findById(response.locals.userId);
     const post = await Post.findById(request.params.id);
 
     if (!post) response.status(404).json({ error: 'post not found.' });

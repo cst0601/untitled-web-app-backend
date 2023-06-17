@@ -31,7 +31,7 @@ describe('user posts', () => {
             .expect(200);
 
         expect(response.body.context).toBe(expectPost.context);
-        expect(response.body.likes).toBe(expectPost.likes);
+        expect(response.body.likes).toBe(0);
         expect(response.body.user.id).toBe(expectPost.user.toString());
     });
 
@@ -78,10 +78,7 @@ describe('user creates / delete a post', () => {
             .send(newPost)
             .expect(201);
 
-        const post = (await helper.postsInDb())
-            .filter(post => post.context === 'This is a new post!')[0];
-
-        expect(post.likes).toBe(0);
+        expect(response.body.likes).toBe(0);
         expect(response.body.context).toBe('This is a new post!');
         expect(response.body).toHaveProperty('createdAt');
         expect(response.body).toHaveProperty('updatedAt');
