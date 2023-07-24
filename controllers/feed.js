@@ -9,7 +9,7 @@ const feedRouter = require('express').Router();
 const Post = require('../models/post');
 const User = require('../models/user');
 
-feedRouter.get('/', async (request, response) => {
+feedRouter.get('/', async (request, response, next) => {
     const requestUser = await User.findById(response.locals.userId);
     const queryUserIds = [ ...requestUser.followedUserIds, requestUser._id ];
 
@@ -21,10 +21,11 @@ feedRouter.get('/', async (request, response) => {
         .limit(100)
         .populate('user', { username: 1, displayName: 1 });
 
-    response.json(posts);
+    response.locals.posts = posts;
+    next();
 });
 
-feedRouter.get('/:username', async (request, response) => {
+feedRouter.get('/:username', async (request, response, next) => {
     const requestUser = await User.findOne({
         username: request.params.username
     });
@@ -34,7 +35,8 @@ feedRouter.get('/:username', async (request, response) => {
         .limit(100)
         .populate('user', { username: 1, displayName: 1 });
 
-    response.json(posts);
+    response.locals.posts = posts;
+    next();
 });
 
 module.exports = feedRouter;

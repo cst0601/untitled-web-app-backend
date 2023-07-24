@@ -45,10 +45,11 @@ postRouter.delete('/:id', async (request, response) => {
     }
 
     await Post.findByIdAndDelete(request.params.id);
+    await Like.deleteMany({ 'postId': request.params.id });
     response.status(204).end();
 });
 
-postRouter.put('/like/:id', async (request, response) => {
+postRouter.put('/like/:id', async (request, response, next) => {
     const post = await Post.findById(request.params.id);
 
     if (!post) response.status(404).json({ error: 'post not found.' });
@@ -61,17 +62,27 @@ postRouter.put('/like/:id', async (request, response) => {
     // likes are unique entries, therefore use findOneAndUpdate with upsert
     // to create new entries.
     await Like.findOneAndUpdate(newLike, newLike, { upsert: true });
+    const updatedPost = await Post
+        .findOne({ _id: request.params.id })
+        .populate('user', { username: 1, displayName: 1 });
 
-    response.status(200).end();
+    //response.status(200).json(updatedPost);
+    response.locals.post = updatedPost;
+    next();
 });
 
-postRouter.delete('/like/:id', async (request, response) => {
+postRouter.delete('/like/:id', async (request, response, next) => {
     await Like.deleteOne({
         userId: response.locals.userId,
         postId: request.params.id
     });
+    const updatedPost = await Post
+        .findOne({ _id: request.params.id })
+        .populate('user', { username: 1, displayName: 1 });
 
-    response.status(200).end();
+    //response.status(200).end();
+    response.locals.post = updatedPost;
+    next();
 });
 
 module.exports = postRouter;

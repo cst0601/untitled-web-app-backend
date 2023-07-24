@@ -143,6 +143,27 @@ describe('user liked / unliked a post', () => {
         token = loginResponse.body.token;
     });
 
+    test('like action returns the full post', async () => {
+        const likedPost = (await helper.postsInDb())[0];
+
+        const response = await api.put(`/api/post/like/${likedPost.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200);
+        const resPost = response.body;
+        const userInfo = resPost.user;
+
+        expect(resPost).toHaveProperty('user');
+        expect(resPost).toHaveProperty('context');
+        expect(resPost).toHaveProperty('createdAt');
+        expect(resPost).toHaveProperty('updatedAt');
+        expect(resPost).toHaveProperty('likes');
+        expect(resPost).toHaveProperty('id');
+
+        expect(userInfo).toHaveProperty('username');
+        expect(userInfo).toHaveProperty('displayName');
+        expect(userInfo).toHaveProperty('id');
+    });
+
     test('user liked a post', async () => {
         const likedPost = (await helper.postsInDb())[0];
 
@@ -187,7 +208,34 @@ describe('user liked / unliked a post', () => {
 
         const like = (await helper.likesInDb())
             .find(like => like.postId.toString() === likedPost.id);
-        console.log(await helper.likesInDb());
         expect(like).toBe(undefined);
+    });
+});
+
+describe('post operation, related to like collection', () => {
+    let token = '';
+    let likedPostId = '';
+
+    beforeAll(async () => {
+        await helper.clearAndCreatePosts();
+        const loginResponse = await api
+            .post('/api/login')
+            .send({ username: 'chikuma', password: '123456789' })
+            .expect(200);
+        token = loginResponse.body.token;
+        const likedPost = (await helper.postsInDb())[0];
+        await api.put(`/api/post/like/${likedPost.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200);
+        likedPostId = likedPost.id;
+    });
+
+    test('delete post also delete related likes', async () => {
+        await api.delete(`/api/post/${likedPostId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(204);
+
+        const likes = await helper.likesInDb();
+        expect(likes.length).toBe(0);
     });
 });
