@@ -1,3 +1,9 @@
+//
+// test_helper.js
+// Util functions for testsing.
+//
+// Created by Chikuma C., 07/24/2776 AUC
+//
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const Post = require('../models/post');

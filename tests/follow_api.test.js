@@ -9,17 +9,14 @@ const app = require('../app');
 const api = supertest(app);
 
 const helper = require('./test_helper');
+const loginUtil = require('./login_util');
 
 describe('follow / unfollow', () => {
     let token = '';
 
     beforeEach(async () => {
         await helper.clearAndCreatePosts();
-        const loginResponse = await api
-            .post('/api/login')
-            .send({ username: 'chikuma', password: '123456789' })
-            .expect(200);
-        token = loginResponse.body.token;
+        token = await loginUtil.loginUser();
     });
 
     test('follow a user success', async () => {

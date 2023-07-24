@@ -66,7 +66,6 @@ postRouter.put('/like/:id', async (request, response, next) => {
         .findOne({ _id: request.params.id })
         .populate('user', { username: 1, displayName: 1 });
 
-    //response.status(200).json(updatedPost);
     response.locals.post = updatedPost;
     next();
 });
@@ -80,7 +79,6 @@ postRouter.delete('/like/:id', async (request, response, next) => {
         .findOne({ _id: request.params.id })
         .populate('user', { username: 1, displayName: 1 });
 
-    //response.status(200).end();
     response.locals.post = updatedPost;
     next();
 });

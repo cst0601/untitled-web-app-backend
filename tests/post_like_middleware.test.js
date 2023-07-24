@@ -1,8 +1,8 @@
 //
-// feed_api.test.js
-// Tests for getting user post feeds.
+// post_like_middleware.test.js
+// Tests for middleware for adding liked field to post.
 //
-// Created by Chikuma C., 05/14/2776 AUC
+// Created by Chikuma C., 07/24/2776 AUC
 //
 const supertest = require('supertest');
 const app = require('../app');
@@ -11,7 +11,7 @@ const api = supertest(app);
 const helper = require('./test_helper');
 const loginUtil = require('./login_util');
 
-describe('get user feeds', () => {
+describe('feed api adding liked field', () => {
     let token = '';
 
     beforeAll(async () => {
@@ -19,14 +19,20 @@ describe('get user feeds', () => {
         token = await loginUtil.loginUser();
     });
 
-    // get feeds
-    test('get recent post of user and its follower', async () => {
+    test('feed api', async () => {
         const response = await api
             .get('/api/feed')
             .set('Authorization', `Bearer ${token}`)
             .expect(200);
 
         expect(response.body).toHaveLength(2);
-        expect(response.body[0].likes).toBe(0);
+        for (const post of response.body) {
+            expect(post).toHaveProperty('liked', false);
+        }
     });
+});
+
+describe('post api adding liked field', () => {
+
+
 });

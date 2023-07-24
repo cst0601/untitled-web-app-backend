@@ -9,6 +9,7 @@ const app = require('../app');
 const api = supertest(app);
 
 const helper = require('./test_helper');
+const loginUtil = require('./login_util');
 
 describe('user posts', () => {
     let expectPost = null;
@@ -60,11 +61,7 @@ describe('user creates / delete a post', () => {
 
     beforeAll(async () => {
         await helper.clearAndCreatePosts();
-        const loginResponse = await api
-            .post('/api/login')
-            .send({ username: 'chikuma', password: '123456789' })
-            .expect(200);
-        token = loginResponse.body.token;
+        token = await loginUtil.loginUser();
     });
 
     test('add post success', async () => {
@@ -136,11 +133,7 @@ describe('user liked / unliked a post', () => {
 
     beforeAll(async () => {
         await helper.clearAndCreatePosts();
-        const loginResponse = await api
-            .post('/api/login')
-            .send({ username: 'chikuma', password: '123456789' })
-            .expect(200);
-        token = loginResponse.body.token;
+        token = await loginUtil.loginUser();
     });
 
     test('like action returns the full post', async () => {
@@ -218,11 +211,7 @@ describe('post operation, related to like collection', () => {
 
     beforeAll(async () => {
         await helper.clearAndCreatePosts();
-        const loginResponse = await api
-            .post('/api/login')
-            .send({ username: 'chikuma', password: '123456789' })
-            .expect(200);
-        token = loginResponse.body.token;
+        token = await loginUtil.loginUser();
         const likedPost = (await helper.postsInDb())[0];
         await api.put(`/api/post/like/${likedPost.id}`)
             .set('Authorization', `Bearer ${token}`)
