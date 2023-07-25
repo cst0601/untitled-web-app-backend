@@ -10,18 +10,21 @@ const Like = require('../models/like');
 const Post = require('../models/post');
 const User = require('../models/user');
 
-postRouter.get('/:id', async (request, response) => {
+postRouter.get('/:id', async (request, response, next) => {
     const post = await Post
         .findOne({ _id: request.params.id })
         .populate('user', { username: 1, displayName: 1 });
 
-    if (post) response.json(post);
+    if (post) {
+        response.locals.post = post;
+        next();
+    }
     else response.status(404).json({
         error: 'post does not exist or deleted.'
     });
 });
 
-postRouter.post('/', async (request, response) => {
+postRouter.post('/', async (request, response, next) => {
     const body = request.body;
     const user = await User.findById(response.locals.userId);
 
@@ -31,7 +34,9 @@ postRouter.post('/', async (request, response) => {
     });
     await post.save();
     const savedPost = await post.populate('user', { displayName: 1, username: 1 });
-    response.status(201).json(savedPost);
+    response.locals.status = 201;
+    response.locals.post = savedPost;
+    next();
 });
 
 postRouter.delete('/:id', async (request, response) => {

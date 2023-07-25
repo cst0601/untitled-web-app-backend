@@ -16,18 +16,20 @@ const addLike = async (post, loggedInUserId) => {
 const addLikeIfLogin = async (request, response) => {
     const userId = response.locals.userId;
     let posts = response.locals.posts;
+    let statusCode = (response.locals.status)? response.locals.status: 200;
 
     posts = await Promise.all(posts.map(post => addLike(post, userId)));
 
-    response.json(posts);
+    response.status(statusCode).json(posts);
 };
 
 const addOneLikeIfLogin = async (request, response) => {
     const userId = response.locals.userId;
     let post = response.locals.post;
+    let statusCode = (response.locals.status)? response.locals.status: 200;
 
     post = await addLike(post, userId);
-    response.status(200).json(post);
+    response.status(statusCode).json(post);
 };
 
 postLikeRouter.get('/api/feed', addLikeIfLogin);
