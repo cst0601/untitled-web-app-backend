@@ -14,13 +14,14 @@ const addLike = async (post, loggedInUserId) => {
 };
 
 const addLikeIfLogin = async (request, response) => {
-    const userId = response.locals.userId;
     let posts = response.locals.posts;
     let statusCode = (response.locals.status)? response.locals.status: 200;
-
+    if (!response.locals.authentication) {
+        return response.status(statusCode).json(posts);
+    }
+    const userId = response.locals.userId;
     posts = await Promise.all(posts.map(post => addLike(post, userId)));
-
-    response.status(statusCode).json(posts);
+    return response.status(statusCode).json(posts);
 };
 
 const addOneLikeIfLogin = async (request, response) => {

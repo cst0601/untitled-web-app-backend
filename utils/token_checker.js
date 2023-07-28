@@ -36,6 +36,28 @@ const checkToken = async (request, response, next) => {
     next();
 };
 
+const softCheckToken = async (request, response, next) => {
+    const requestToken = getTokenFrom(request);
+    if (!requestToken) {
+        response.locals.userId = undefined;
+        response.locals.authentication = false;
+        next();
+    }
+    else {
+        try {
+            const decodedToken = jwt.verify(requestToken, process.env.SECRET);
+            if (!decodedToken.id) {
+                return response.status(401).json({ error: 'invalid token' });
+            }
+            response.locals.userId = decodedToken.id;
+            response.locals.authentication = true;
+        } catch (error) {
+            return response.status(401).json({ error: 'invalid token' });
+        }
+        next();
+    }
+};
+
 // router paths that requires authentication
 // hard check
 tokenCheckRouter.post('/api/post', checkToken);
@@ -47,7 +69,7 @@ tokenCheckRouter.get('/api/feed', checkToken);
 tokenCheckRouter.post('/api/follow/:id', checkToken);
 
 // soft check
-
+tokenCheckRouter.get('/api/feed/:username', softCheckToken);
 
 
 module.exports = tokenCheckRouter;
