@@ -29,4 +29,13 @@ describe('get user feeds', () => {
         expect(response.body).toHaveLength(2);
         expect(response.body[0].likes).toBe(0);
     });
+
+    test('if user does not exist', async () => {
+        const response = await api
+            .get('/api/feed/non-exist-username')
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200);
+
+        expect(response.body.error).toBe('The requested user does not exist');
+    });
 });

@@ -29,6 +29,13 @@ feedRouter.get('/:username', async (request, response, next) => {
     const requestUser = await User.findOne({
         username: request.params.username
     });
+
+    if (!requestUser) {
+        return response.status(200).json({
+            error: 'The requested user does not exist'
+        });
+    }
+
     const posts = await Post
         .find({ user: requestUser })
         .sort({ createdAt: -1 })
