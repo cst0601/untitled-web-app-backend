@@ -29,4 +29,25 @@ followRouter.post('/:id', async (request, response) => {
     response.status(200).end();
 });
 
+followRouter.delete('/:id', async (request, response) => {
+    const unfollowedUser = await User.findById(request.params.id);
+    if (!unfollowedUser) {
+        return response.status(400).json({
+            error: 'user does not exist.',
+        });
+    }
+    else if (unfollowedUser._id.toString() === response.locals.userId) {
+        return response.status(400).json({
+            error: 'cannot unfollow yourself.',
+        });
+    }
+
+    await User.findByIdAndUpdate(
+        response.locals.userId,
+        { $pullAll: { followedUserIds: [unfollowedUser._id] } }
+    );
+
+    response.status(200).end();
+});
+
 module.exports = followRouter;

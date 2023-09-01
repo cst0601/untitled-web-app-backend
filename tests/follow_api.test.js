@@ -80,4 +80,19 @@ describe('follow / unfollow', () => {
             .set('Authorization', `Bearer ${token}`)
             .expect(400);
     });
+
+    test('unfollow user', async () => {
+        const users = (await helper.usersInDb());
+        const unfollowUser = users.find(
+            user => user.username === 'sakuramiko35');
+
+        await api
+            .delete(`/api/follow/${unfollowUser.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200)
+
+        const userId = users.find(user => user.username === 'chikuma').id;
+        const followers = await helper.getUserFollowers(userId);
+        expect(followers).toHaveLength(0);
+    });
 });
