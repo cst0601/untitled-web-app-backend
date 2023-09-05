@@ -43,6 +43,16 @@ const nonExistingUserId = async () => {
     return user._id.toString();
 };
 
+const followUserByUsername = async (followingUsername) => {
+    const userId = await User.findOne({ username: 'chikuma' });
+    const followingUserId = (await User.findOne(
+        { username: followingUsername }))._id;
+    await User.findByIdAndUpdate(
+        userId,
+        { $addToSet: { followedUserIds: followingUserId } }
+    );
+};
+
 const getUserFollowers = async (userId) => {
     const user = await User.findById(userId);
     const followerIds = user.followedUserIds.map(id => id.toString());
@@ -127,6 +137,7 @@ module.exports = {
     nonExistingUserId,
     clearAndCreateUsers,
     getUserFollowers,
+    followUserByUsername,
     postsInDb,
     nonExistingPostId,
     clearAndCreatePosts,

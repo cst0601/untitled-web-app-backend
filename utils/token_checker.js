@@ -70,6 +70,6 @@ tokenCheckRouter.post('/api/follow/:id', checkToken);
 
 // soft check
 tokenCheckRouter.get('/api/feed/:username', softCheckToken);
-
+tokenCheckRouter.get('/api/user/:id', softCheckToken);
 
 module.exports = tokenCheckRouter;

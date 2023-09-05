@@ -9,9 +9,26 @@ const userRouter = require('express').Router();
 const User = require('../models/user');
 const signToken = require('../utils/token');
 
+const isUserFollowed = async (loginUserId, userId) => {
+    if (!loginUserId) return false; // query takes time, if null return early
+    const loginUser = await User.findById(loginUserId);
+    return (loginUser.followedUserIds.find(
+        id => id.toString() === userId.toString()))? true: false;
+};
+
 userRouter.get('/:id', async (request, response) => {
-    const user = await User
-        .findById(request.params.id);
+    const user = await User.findById(request.params.id);
+
+    if (user) {
+        const responseJson = user.toJSON();
+        responseJson.isFollowed = await isUserFollowed(response.locals.userId, user._id);
+        response.json(responseJson);
+    }
+    else response.status(404).end();
+});
+
+userRouter.get('/username/:username', async (request, response) => {
+    const user = await User.findOne({ username: request.params.username });
 
     if (user) response.json(user);
     else response.status(404).end();
