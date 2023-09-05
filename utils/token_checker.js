@@ -36,6 +36,7 @@ const checkToken = async (request, response, next) => {
     next();
 };
 
+// if token does not exist in request, continue with next middleware.
 const softCheckToken = async (request, response, next) => {
     const requestToken = getTokenFrom(request);
     if (!requestToken) {
@@ -67,9 +68,11 @@ tokenCheckRouter.delete('/api/post/like/:id', checkToken);
 tokenCheckRouter.get('/api/feed', checkToken);
 
 tokenCheckRouter.post('/api/follow/:id', checkToken);
+tokenCheckRouter.delete('/api/follow/:id', checkToken);
 
 // soft check
 tokenCheckRouter.get('/api/feed/:username', softCheckToken);
 tokenCheckRouter.get('/api/user/:id', softCheckToken);
+tokenCheckRouter.get('/api/user/username/:username', softCheckToken);
 
 module.exports = tokenCheckRouter;

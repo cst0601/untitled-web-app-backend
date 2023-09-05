@@ -44,7 +44,7 @@ followRouter.delete('/:id', async (request, response) => {
 
     await User.findByIdAndUpdate(
         response.locals.userId,
-        { $pullAll: { followedUserIds: [unfollowedUser._id] } }
+        { $pullAll: { followedUserIds: [ unfollowedUser._id ] } },
     );
 
     response.status(200).end();

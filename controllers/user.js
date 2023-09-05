@@ -30,7 +30,11 @@ userRouter.get('/:id', async (request, response) => {
 userRouter.get('/username/:username', async (request, response) => {
     const user = await User.findOne({ username: request.params.username });
 
-    if (user) response.json(user);
+    if (user) {
+        const responseJson = user.toJSON();
+        responseJson.isFollowed = await isUserFollowed(response.locals.userId, user._id);
+        response.json(responseJson);
+    }
     else response.status(404).end();
 });
 

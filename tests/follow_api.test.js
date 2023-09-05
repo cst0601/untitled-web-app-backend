@@ -87,9 +87,14 @@ describe('follow / unfollow', () => {
             user => user.username === 'sakuramiko35');
 
         await api
+            .post(`/api/follow/${unfollowUser.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200);
+
+        await api
             .delete(`/api/follow/${unfollowUser.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .expect(200)
+            .expect(200);
 
         const userId = users.find(user => user.username === 'chikuma').id;
         const followers = await helper.getUserFollowers(userId);
